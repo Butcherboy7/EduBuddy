@@ -1,3 +1,4 @@
 flask
 flask-replit-auth
 gunicorn
+google-generativeai
