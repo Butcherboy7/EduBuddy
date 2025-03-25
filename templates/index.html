@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduBuddy - AI Learning Assistant</title>
+    <!-- Replit-themed bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Highlight.js for code syntax highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <!-- Markdown-it for rendering markdown -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/13.0.1/markdown-it.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container-fluid h-100 d-flex flex-column">
+        <!-- Header -->
+        <header class="row py-3 border-bottom">
+            <div class="col-12 d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-robot me-2 text-primary fs-3"></i>
+                    <h1 class="h4 mb-0">EduBuddy - Your AI Learning Partner</h1>
+                </div>
+                <div class="d-flex gap-2">
+                    <!-- Theme toggle button -->
+                    <button class="btn btn-outline-secondary btn-sm" id="theme-toggle">
+                        <i class="fas fa-moon me-1" id="theme-icon"></i><span id="theme-text">Dark Mode</span>
+                    </button>
+                    <!-- Clear chat button -->
+                    <button class="btn btn-outline-secondary btn-sm" id="clear-chat">
+                        <i class="fas fa-trash me-1"></i>Clear Chat
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main chat area -->
+        <main class="row flex-grow-1 overflow-hidden">
+            <div class="col-12 h-100 d-flex flex-column">
+                <!-- Messages container -->
+                <div id="chat-messages" class="flex-grow-1 overflow-auto p-3">
+                    <!-- Welcome message -->
+                    <div class="message assistant-message">
+                        <div class="message-avatar">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="message-content">
+                            <div class="message-text">
+                                <p>Hello! I'm EduBuddy, your AI learning assistant. I can help with explanations, examples, and learning resources across various subjects. What would you like to learn about today?</p>
+                            </div>
+                            <div class="message-actions">
+                                <button class="btn btn-sm copy-btn" data-message-id="welcome">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Messages will be added here dynamically -->
+                </div>
+
+                <!-- Persona Selection UI (initially hidden) -->
+                <div id="persona-selection" class="text-center p-4 position-absolute start-0 end-0 bottom-0 border-top bg-dark bg-opacity-95" style="display: none;">
+                    <h5 class="mb-3">What's on your mind today?</h5>
+                    <p class="text-muted mb-4">Select an area to help me provide more tailored responses.</p>
+                    <div class="d-flex flex-wrap justify-content-center gap-3">
+                        <button class="btn btn-lg btn-outline-primary persona-btn" data-persona="code">
+                            <i class="fas fa-code fs-4 d-block mb-2"></i>
+                            🖥️ Code
+                        </button>
+                        <button class="btn btn-lg btn-outline-success persona-btn" data-persona="stem">
+                            <i class="fas fa-flask fs-4 d-block mb-2"></i>
+                            🔬 STEM Subjects
+                        </button>
+                        <button class="btn btn-lg btn-outline-info persona-btn" data-persona="business">
+                            <i class="fas fa-chart-line fs-4 d-block mb-2"></i>
+                            💼 Business
+                        </button>
+                        <button class="btn btn-lg btn-outline-secondary persona-btn" data-persona="general">
+                            <i class="fas fa-book fs-4 d-block mb-2"></i>
+                            🎓 General Learning
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Dynamic Action Buttons (hidden by default) -->
+                <div id="quick-actions" class="px-3 pb-2" style="display: none;">
+                    <!-- Default action groups - will be dynamically updated based on conversation context -->
+                    <div id="code-actions" class="quick-action-group" style="display: none;">
+                        <button class="btn btn-sm btn-outline-primary action-btn me-2 mb-2" data-action="debug">🛠 Debug My Code</button>
+                        <button class="btn btn-sm btn-outline-primary action-btn me-2 mb-2" data-action="optimize">🚀 Optimize This Code</button>
+                        <button class="btn btn-sm btn-outline-primary action-btn me-2 mb-2" data-action="explain">📝 Explain This Code</button>
+                        <button class="btn btn-sm btn-outline-primary action-btn me-2 mb-2" data-action="best-practices">✅ Best Practices</button>
+                    </div>
+                    <div id="stem-actions" class="quick-action-group" style="display: none;">
+                        <button class="btn btn-sm btn-outline-success action-btn me-2 mb-2" data-action="formula">🔢 Formula Sheet</button>
+                        <button class="btn btn-sm btn-outline-success action-btn me-2 mb-2" data-action="simplify">📌 Simplify It</button>
+                        <button class="btn btn-sm btn-outline-success action-btn me-2 mb-2" data-action="examples">🧪 Show Examples</button>
+                        <button class="btn btn-sm btn-outline-success action-btn me-2 mb-2" data-action="quiz">❓ Quiz Me</button>
+                    </div>
+                    <div id="business-actions" class="quick-action-group" style="display: none;">
+                        <button class="btn btn-sm btn-outline-info action-btn me-2 mb-2" data-action="case-studies">🔍 Case Studies</button>
+                        <button class="btn btn-sm btn-outline-info action-btn me-2 mb-2" data-action="trends">📈 Current Trends</button>
+                        <button class="btn btn-sm btn-outline-info action-btn me-2 mb-2" data-action="analysis">📊 Market Analysis</button>
+                        <button class="btn btn-sm btn-outline-info action-btn me-2 mb-2" data-action="strategy">🎯 Strategic Approach</button>
+                    </div>
+                    <div id="general-actions" class="quick-action-group" style="display: none;">
+                        <button class="btn btn-sm btn-outline-secondary action-btn me-2 mb-2" data-action="summary">📚 Summarize</button>
+                        <button class="btn btn-sm btn-outline-secondary action-btn me-2 mb-2" data-action="explain">🔎 Explain Simply</button>
+                        <button class="btn btn-sm btn-outline-secondary action-btn me-2 mb-2" data-action="resources">📋 Learning Resources</button>
+                        <button class="btn btn-sm btn-outline-secondary action-btn me-2 mb-2" data-action="visualize">🖼️ Visualize This</button>
+                    </div>
+                    
+                    <!-- Dynamic subject-specific action groups -->
+                    <div id="context-actions" class="dynamic-action-group" style="display: none;">
+                        <!-- Will be filled dynamically based on conversation context -->
+                    </div>
+                </div>
+
+                <!-- Stop Generation Button (hidden by default) -->
+                <div id="stop-generation" class="position-absolute" style="bottom: 80px; left: 20px; display: none;">
+                    <button id="stop-btn" class="btn btn-danger btn-sm">
+                        <i class="fas fa-stop me-1"></i>Stop Generating
+                    </button>
+                </div>
+
+                <!-- Scroll to bottom button (hidden by default) -->
+                <button id="scroll-bottom" class="btn btn-primary rounded-circle position-absolute" style="bottom: 80px; right: 20px; display: none;">
+                    <i class="fas fa-arrow-down"></i>
+                </button>
+
+                <!-- Input container -->
+                <div class="p-3 border-top">
+                    <form id="chat-form" class="d-flex">
+                        <div class="input-group">
+                            <textarea 
+                                id="user-input" 
+                                class="form-control" 
+                                placeholder="Ask EduBuddy a question..." 
+                                rows="1"
+                                required
+                            ></textarea>
+                            <button type="submit" class="btn btn-primary" id="send-button">
+                                <i class="fas fa-paper-plane me-1"></i>Send
+                            </button>
+                        </div>
+                    </form>
+                    <div class="text-muted small mt-2 d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-info-circle me-1"></i>
+                            Powered by Google's Gemini 1.5 Pro model
+                        </div>
+                        <div id="persona-badge" class="d-none">
+                            <span class="badge bg-primary" id="current-persona-badge"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Loading message templates (hidden) -->
+    <div id="loading-messages" class="d-none">
+        <div class="message-template">Thinking about that...</div>
+        <div class="message-template">Analyzing your question...</div>
+        <div class="message-template">Searching for the best explanation...</div>
+        <div class="message-template">Crafting a detailed response...</div>
+        <div class="message-template">Finding relevant examples...</div>
+        <div class="message-template">Exploring this topic for you...</div>
+        <div class="message-template">Working on your answer...</div>
+    </div>
+
+    <!-- Dynamic subject-specific action templates (hidden) -->
+    <div id="subject-action-templates" class="d-none">
+        <!-- Math-specific actions -->
+        <div data-subject="math" data-context="math,algebra,calculus,geometry,equation,formula,theorem,proof">
+            <button class="btn btn-sm btn-outline-success subject-action-btn me-2 mb-2" data-action="formula-sheet">📐 Generate Formula Sheet</button>
+            <button class="btn btn-sm btn-outline-success subject-action-btn me-2 mb-2" data-action="step-by-step">🔢 Step-by-Step Solution</button>
+            <button class="btn btn-sm btn-outline-success subject-action-btn me-2 mb-2" data-action="visual-proof">📊 Visual Proof</button>
+        </div>
+        
+        <!-- Biology-specific actions -->
+        <div data-subject="biology" data-context="biology,cell,organism,gene,dna,protein,evolution,ecosystem">
+            <button class="btn btn-sm btn-outline-success subject-action-btn me-2 mb-2" data-action="cell-diagram">🧬 Explore Cell Diagrams</button>
+            <button class="btn btn-sm btn-outline-success subject-action-btn me-2 mb-2" data-action="biological-process">🔄 Explain Biological Process</button>
+            <button class="btn btn-sm btn-outline-success subject-action-btn me-2 mb-2" data-action="evolutionary-context">🌳 Evolutionary Context</button>
+        </div>
+        
+        <!-- Physics-specific actions -->
+        <div data-subject="physics" data-context="physics,force,energy,motion,gravity,quantum,relativity,momentum,electricity">
+            <button class="btn btn-sm btn-outline-success subject-action-btn me-2 mb-2" data-action="physics-formula">⚡ Physics Formulas</button>
+            <button class="btn btn-sm btn-outline-success subject-action-btn me-2 mb-2" data-action="real-world-example">🌍 Real-Life Scenarios</button>
+            <button class="btn btn-sm btn-outline-success subject-action-btn me-2 mb-2" data-action="simulation">🔮 Thought Experiment</button>
+        </div>
+        
+        <!-- Chemistry-specific actions -->
+        <div data-subject="chemistry" data-context="chemistry,chemical,reaction,molecule,atom,element,compound,bond,solution,acid,base">
+            <button class="btn btn-sm btn-outline-success subject-action-btn me-2 mb-2" data-action="chemical-equation">⚗️ Balance Chemical Equation</button>
+            <button class="btn btn-sm btn-outline-success subject-action-btn me-2 mb-2" data-action="molecular-structure">🔍 Molecular Structure</button>
+            <button class="btn btn-sm btn-outline-success subject-action-btn me-2 mb-2" data-action="reaction-mechanism">⚡ Reaction Mechanism</button>
+        </div>
+        
+        <!-- Programming language-specific actions -->
+        <div data-subject="programming" data-context="javascript,python,java,c++,code,function,programming,algorithm,data structure">
+            <button class="btn btn-sm btn-outline-primary subject-action-btn me-2 mb-2" data-action="code-example">📝 Code Example</button>
+            <button class="btn btn-sm btn-outline-primary subject-action-btn me-2 mb-2" data-action="debug-help">🛠️ Debug Help</button>
+            <button class="btn btn-sm btn-outline-primary subject-action-btn me-2 mb-2" data-action="algorithm-complexity">⏱️ Algorithm Complexity</button>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- TypeIt for typing animation -->
+    <script src="https://unpkg.com/typeit@8.7.1/dist/index.umd.js"></script>
+    <!-- Custom JS -->
+    <script src="/static/js/chat.js"></script>
+</body>
+</html>
